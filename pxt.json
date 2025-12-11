@@ -1,5 +1,5 @@
 {
-    "name": "MakeCode-Arcade-Template",
+    "name": "conversor",
     "description": "",
     "dependencies": {
         "device": "*"
