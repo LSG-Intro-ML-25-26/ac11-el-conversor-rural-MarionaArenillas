@@ -22,6 +22,9 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
+info.onCountdownEnd(function () {
+    game.gameOver(false)
+})
 scene.onOverlapTile(SpriteKind.Player, assets.tile`arbre`, function (sprite, location) {
     info.changeScoreBy(1)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
