@@ -38,6 +38,9 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
+scene.onOverlapTile(SpriteKind.Player, assets.tile`exit`, function (sprite, location) {
+    game.gameOver(true)
+})
 let nena: Sprite = null
 tiles.setCurrentTilemap(tilemap`nivel2`)
 nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
