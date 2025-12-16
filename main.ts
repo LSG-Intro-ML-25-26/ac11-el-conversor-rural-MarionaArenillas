@@ -31,5 +31,8 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 let nena: Sprite = null
+tiles.setCurrentTilemap(tilemap`nivel2`)
 nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
-controller.moveSprite(nena)
+tiles.placeOnRandomTile(nena, assets.tile`stage`)
+controller.moveSprite(nena, 100, 100)
+scene.cameraFollowSprite(nena)
