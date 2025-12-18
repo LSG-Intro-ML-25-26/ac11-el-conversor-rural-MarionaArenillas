@@ -2,7 +2,9 @@
     "name": "conversor",
     "description": "",
     "dependencies": {
-        "device": "*"
+        "device": "*",
+        "Demo": "github:raimonizard/demo#e66e789d80aeeeaa46bd911ad6d95578c4589327",
+        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.0.1"
     },
     "files": [
         "main.blocks",

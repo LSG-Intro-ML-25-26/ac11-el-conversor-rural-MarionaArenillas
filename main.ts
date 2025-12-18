@@ -1,3 +1,4 @@
+// Funcions moviments animats de la nena
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
     nena,
@@ -6,10 +7,10 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
+// Funció per crear arbres cada 5 segons en llocs aleatoris
 function crear_arbres_continuament () {
     while (true) {
         pause(5000)
-        // cada 10 segons surt un arbre nou
         arbre = sprites.create(assets.image`arbre`, SpriteKind.Enemy)
         tiles.placeOnRandomTile(arbre, assets.tile`transparency16`)
     }

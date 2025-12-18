@@ -1,3 +1,4 @@
+# Funcions moviments animats de la nena
 def on_down_pressed():
     animation.run_image_animation(nena,
         assets.animation("""
@@ -7,11 +8,11 @@ def on_down_pressed():
         False)
 controller.down.on_event(ControllerButtonEvent.PRESSED, on_down_pressed)
 
-
+# Funció per crear arbres cada 5 segons en llocs aleatoris
 def crear_arbres_continuament():
+    global arbre
     while True:
-        pause(10000)
-        # cada 10 segons surt un arbre nou
+        pause(5000)
         arbre = sprites.create(assets.image("""
             arbre
             """), SpriteKind.enemy)
@@ -41,13 +42,6 @@ def on_countdown_end():
     game.game_over(False)
 info.on_countdown_end(on_countdown_end)
 
-def on_on_overlap(player2, enemy):
-    info.change_score_by(1)
-    music.play(music.melody_playable(music.power_up),
-        music.PlaybackMode.IN_BACKGROUND)
-    sprites.destroy(enemy, effects.spray, 500)
-sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_on_overlap)
-
 def on_up_pressed():
     animation.run_image_animation(nena,
         assets.animation("""
@@ -63,9 +57,17 @@ scene.on_overlap_tile(SpriteKind.player,
     sprites.castle.tile_dark_grass2,
     on_overlap_tile)
 
+def on_on_overlap(player2, enemy):
+    info.change_score_by(1)
+    music.play(music.melody_playable(music.power_up),
+        music.PlaybackMode.IN_BACKGROUND)
+    sprites.destroy(enemy, effects.spray, 500)
+sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_on_overlap)
+
+arbre: Sprite = None
 nena: Sprite = None
 tiles.set_current_tilemap(tilemap("""
-    nivel2
+    mapa0
     """))
 nena = sprites.create(assets.image("""
     nena-front
