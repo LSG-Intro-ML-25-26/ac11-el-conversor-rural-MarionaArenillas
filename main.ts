@@ -4,7 +4,29 @@ namespace SpriteKind {
     export const dropeador = SpriteKind.create()
 }
 function obrir_trueque () {
+    clicPermes = false
+    quantitatSeleccionada = textsprite.create("1")
+    quantitatSeleccionada.setMaxFontHeight(15)
+    quantitatSeleccionada.setPosition(80, 75)
     quantitat = 1
+    cursor = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Player)
 }
 function trueque () {
     if (seleccionarItem.includes("Ous") && info.score() >= 3 * quantitat) {
@@ -87,6 +109,13 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     menuObert = false
     controller.moveSprite(nena, 100, 100)
 })
+sprites.onOverlap(SpriteKind.sumar, SpriteKind.Player, function (sprite, otherSprite) {
+    if (otherSprite == cursor && clicPermes) {
+        quantitat += 1
+        quantitatSeleccionada.setText("" + quantitat)
+        clicPermes = false
+    }
+})
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
     joc = false
     obrir_trueque()
@@ -107,6 +136,13 @@ scene.onOverlapTile(SpriteKind.Player, assets.tile`instrument3`, function (sprit
     tiles.placeOnRandomTile(nena, sprites.dungeon.chestOpen)
     obrir_menu()
 })
+sprites.onOverlap(SpriteKind.restar, SpriteKind.Player, function (sprite, otherSprite) {
+    if (otherSprite == cursor && clicPermes && quantitat > 1) {
+        quantitat += 0 - 1
+        quantitatSeleccionada.setText("" + quantitat)
+        clicPermes = false
+    }
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (player2, enemy) {
     info.changeScoreBy(1)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
@@ -116,7 +152,10 @@ let arbre: Sprite = null
 let myMenu: miniMenu.MenuSprite = null
 let inventari: miniMenu.MenuItem[] = []
 let seleccionarItem = ""
+let cursor: Sprite = null
 let quantitat = 0
+let quantitatSeleccionada: TextSprite = null
+let clicPermes = false
 let nena: Sprite = null
 let menuObert = false
 let gallines = 0

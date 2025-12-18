@@ -4,7 +4,8 @@
     "dependencies": {
         "device": "*",
         "Demo": "github:raimonizard/demo#e66e789d80aeeeaa46bd911ad6d95578c4589327",
-        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.0.1"
+        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.0.1",
+        "arcade-text": "github:microsoft/arcade-text#v1.3.0"
     },
     "files": [
         "main.blocks",
