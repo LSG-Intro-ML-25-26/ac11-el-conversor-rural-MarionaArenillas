@@ -1,6 +1,7 @@
 namespace SpriteKind {
     export const sumar = SpriteKind.create()
     export const restar = SpriteKind.create()
+    export const dropeador = SpriteKind.create()
 }
 // Funcions moviments animats de la nena
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -13,21 +14,21 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 // Funció menú inventari
 function obrir_menu () {
-    controller.moveSprite(nena, 0, 0)
+    menuObert = true
     joc = false
+    controller.moveSprite(nena, 0, 0)
     inventari = [
     miniMenu.createMenuItem("Ous" + ("" + ous), assets.image`ou`),
     miniMenu.createMenuItem("Gallines" + ("" + gallines), assets.image`gallina1`),
     miniMenu.createMenuItem("Cavalls" + ("" + cavalls), assets.image`cavall1`),
     miniMenu.createMenuItem("Cabres" + ("" + cabres), assets.image`cabra1`),
-    miniMenu.createMenuItem("Arbres" + ("" + arbre), assets.image`arbre`),
     miniMenu.createMenuItem("1,5kg/patates" + ("" + patates), assets.image`patata1`)
     ]
     myMenu = miniMenu.createMenuFromArray(inventari)
     myMenu.setTitle("Inventari")
-    myMenu.setFrame(assets.image`menu`)
+    myMenu.setFrame(assets.image`menu1`)
     myMenu.setPosition(80, 60)
-    myMenu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 8)
+    myMenu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 50)
     myMenu.onButtonPressed(controller.A, function (selection, selectedIndex) {
         seleccionarItem = selection
         myMenu.close()
@@ -35,7 +36,7 @@ function obrir_menu () {
 }
 // Funció per crear arbres cada 5 segons en llocs aleatoris
 function crear_arbres_continuament () {
-    while (true) {
+    while (joc == true) {
         pause(5000)
         arbre = sprites.create(assets.image`arbre`, SpriteKind.Enemy)
         tiles.placeOnRandomTile(arbre, assets.tile`transparency16`)
@@ -58,14 +59,13 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    tiles.placeOnRandomTile(nena, sprites.dungeon.chestClosed)
+    tiles.placeOnRandomTile(nena, sprites.dungeon.darkGroundCenter)
     joc = true
+    menuObert = false
     controller.moveSprite(nena, 100, 100)
 })
-controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (joc == false) {
-        obrir_menu()
-    }
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
+    joc = false
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
@@ -79,20 +79,21 @@ scene.onOverlapTile(SpriteKind.Player, sprites.castle.tileDarkGrass2, function (
     game.gameOver(true)
 })
 scene.onOverlapTile(SpriteKind.Player, assets.tile`instrument3`, function (sprite2, location2) {
-    tiles.placeOnRandomTile(nena, sprites.dungeon.chestOpen)
     joc = false
-    nena.sayText("Clica B per entrar a l'Inventari", 2000, false)
+    tiles.placeOnRandomTile(nena, sprites.dungeon.chestOpen)
+    obrir_menu()
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (player2, enemy) {
     info.changeScoreBy(1)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
     sprites.destroy(enemy, effects.spray, 500)
 })
+let arbre: Sprite = null
 let seleccionarItem = ""
 let myMenu: miniMenu.MenuSprite = null
-let arbre: Sprite = null
 let inventari: miniMenu.MenuItem[] = []
 let nena: Sprite = null
+let menuObert = false
 let gallines = 0
 let cavalls = 0
 let cabres = 0
@@ -106,12 +107,18 @@ ous = 0
 cabres = 0
 cavalls = 0
 gallines = 0
+menuObert = false
+tiles.setCurrentTilemap(tilemap`mapa0`)
+nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
+tiles.placeOnRandomTile(nena, assets.tile`stage`)
+game.onUpdate(function () {
+    if (menuObert == true) {
+        scene.centerCameraAt(80, 60)
+    }
+})
 // Condicions sempre
 forever(function () {
     if (joc == true) {
-        tiles.setCurrentTilemap(tilemap`mapa0`)
-        nena = sprites.create(assets.image`nena-front`, SpriteKind.Player)
-        tiles.placeOnRandomTile(nena, assets.tile`stage`)
         controller.moveSprite(nena, 100, 100)
         scene.cameraFollowSprite(nena)
         crear_arbres_continuament()
