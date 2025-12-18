@@ -7,16 +7,20 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
-scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestOpen, function (sprite2, location2) {
-    obrir_menu()
-})
 function obrir_menu () {
+    let cabres = 0
+    info.stopCountdown()
     joc = false
-    myMenu = miniMenu.createMenuFromArray([
-    miniMenu.createMenuItem("ou" + ("" + ous), assets.image`ou`),
-    miniMenu.createMenuItem("gallina" + ("" + gallines), assets.image`gallines`),
-    miniMenu.createMenuItem("cavall" + ("" + cavalls), assets.image`hamb`)
+    inventari = miniMenu.createMenuFromArray([
+    miniMenu.createMenuItem("ous" + ("" + ous), assets.image`ou`),
+    miniMenu.createMenuItem("gallines" + ("" + gallines), assets.image`gallina1`),
+    miniMenu.createMenuItem("cavalls" + ("" + cavalls), assets.image`cavall1`),
+    miniMenu.createMenuItem("cabres" + ("" + cabres), assets.image`cabra1`),
+    miniMenu.createMenuItem("arbres" + ("" + arbre), assets.image`arbre`),
+    miniMenu.createMenuItem("1,5kg/patates" + ("" + patates), assets.image`patata1`)
     ])
+    myMenu = miniMenu.createMenuFromArray(inventari)
+    myMenu.setTitle("Inventari")
 }
 // Funció per crear arbres cada 5 segons en llocs aleatoris
 function crear_arbres_continuament () {
@@ -42,6 +46,11 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     false
     )
 })
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite2, location2) {
+    if (joc) {
+        obrir_menu()
+    }
+})
 // Quan s'acaba el temps perds
 info.onCountdownEnd(function () {
     game.gameOver(false)
@@ -62,15 +71,18 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (player2, enemy)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
     sprites.destroy(enemy, effects.spray, 500)
 })
-let arbre: Sprite = null
 let myMenu: miniMenu.MenuSprite = null
+let arbre: Sprite = null
+let inventari: miniMenu.MenuSprite = null
 let nena: Sprite = null
 let joc = false
 let ous = 0
 let gallines = 0
 let cavalls = 0
-cavalls = 0
 let patates = 0
+patates = 0
+// Imatge gallina
+cavalls = 0
 gallines = 0
 ous = 0
 joc = true
