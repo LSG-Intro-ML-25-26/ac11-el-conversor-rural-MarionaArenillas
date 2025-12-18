@@ -3,6 +3,29 @@ namespace SpriteKind {
     export const restar = SpriteKind.create()
     export const dropeador = SpriteKind.create()
 }
+function obrir_trueque () {
+    quantitat = 1
+}
+function trueque () {
+    if (seleccionarItem.includes("Ous") && info.score() >= 3 * quantitat) {
+        ous += 12 * quantitat
+        info.changeScoreBy(-3 * quantitat)
+    } else if (seleccionarItem.includes("Gallines") && info.score() >= 6 * quantitat) {
+        gallines += 1 * quantitat
+        info.changeScoreBy(-6 * quantitat)
+    } else if (seleccionarItem.includes("Cavalls") && info.score() >= 12 * quantitat) {
+        cavalls += 1 * quantitat
+        info.changeScoreBy(-12 * quantitat)
+    } else if (seleccionarItem.includes("Cabres") && info.score() >= 5 * quantitat) {
+        cabres += 1 * quantitat
+        info.changeScoreBy(-5 * quantitat)
+    } else if (seleccionarItem.includes("patates") && info.score() >= 2 * quantitat) {
+        cabres += 1 * quantitat
+        info.changeScoreBy(-2 * quantitat)
+    } else {
+        game.splash("No tens suficients arbres per fer un trueque!")
+    }
+}
 // Funcions moviments animats de la nena
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
@@ -66,6 +89,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
     joc = false
+    obrir_trueque()
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
@@ -89,9 +113,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (player2, enemy)
     sprites.destroy(enemy, effects.spray, 500)
 })
 let arbre: Sprite = null
-let seleccionarItem = ""
 let myMenu: miniMenu.MenuSprite = null
 let inventari: miniMenu.MenuItem[] = []
+let seleccionarItem = ""
+let quantitat = 0
 let nena: Sprite = null
 let menuObert = false
 let gallines = 0
