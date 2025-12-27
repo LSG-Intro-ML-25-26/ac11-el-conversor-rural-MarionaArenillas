@@ -109,6 +109,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "confirmar"
     },
+    "image19": {
+        "data": "hwQWABAAAAD//////////x8RERERERHxHxHx//8REfEfERH/ERER8R8REfEfERHxHxER/xEREfEfEfH//xER8R8RERERERHxHxHx//8REfEfEfER8RER8R8R8f//ERHxHxEREREREfEfEfH//xER8R8R8RHxERHxHxHxEfEREfEfERH/HxER8R8RERERERHxHxHx//8REfEfEfHx8RER8R8R8RHxERHxHxEREREREfH//////////w==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "mode"
+    },
     "anim2": {
         "namespace": "myAnimations",
         "id": "anim2",

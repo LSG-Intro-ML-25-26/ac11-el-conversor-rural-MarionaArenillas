@@ -4,9 +4,25 @@ namespace SpriteKind {
     export const dropeador = SpriteKind.create()
     export const cursor = SpriteKind.create()
     export const confirmar = SpriteKind.create()
+    export const mode = SpriteKind.create()
 }
 
-sprites.onOverlap(SpriteKind.restar, SpriteKind.cursor, function on_on_overlap(sprite3: Sprite, otherSprite2: Sprite) {
+sprites.onOverlap(SpriteKind.mode, SpriteKind.cursor, function on_on_overlap(sprite: Sprite, otherSprite: Sprite) {
+    
+    if (pantalla == "trueque" && clicPermes) {
+        clicPermes = false
+        if (modeTrueque == "comprar") {
+            modeTrueque = "vendre"
+        } else {
+            modeTrueque = "comprar"
+        }
+        
+        actualitzar_text_mode()
+        game.splash("Mode canviat!")
+    }
+    
+})
+sprites.onOverlap(SpriteKind.restar, SpriteKind.cursor, function on_on_overlap2(sprite3: Sprite, otherSprite2: Sprite) {
     
     if (clicPermes && quantitat > 1) {
         quantitat += 0 - 1
@@ -35,10 +51,12 @@ function obrir_trueque() {
         controller.moveSprite(nena, 0, 0)
     }
     
+    //  Quantitats
     quantitatSeleccionada = textsprite.create("1")
     quantitatSeleccionada.setMaxFontHeight(15)
     quantitatSeleccionada.setPosition(80, 29)
     sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
+    //  Botons
     sumarBoto = sprites.create(assets.image`
         sumar
         `, SpriteKind.sumar)
@@ -51,37 +69,130 @@ function obrir_trueque() {
             confirmar
             `, SpriteKind.confirmar)
     confirmarBoto.setPosition(76, 59)
+    modeBoto = sprites.create(assets.image`
+        mode
+        `, SpriteKind.mode)
+    modeBoto.setPosition(76, 94)
+    modeText = textsprite.create("Mode: COMPRAR")
+    modeText.setMaxFontHeight(10)
+    modeText.setPosition(80, 12)
     cursor2 = sprites.create(assets.image`
         cursor
         `, SpriteKind.cursor)
-    cursor2.setPosition(76, 94)
+    cursor2.setPosition(76, 110)
     controller.moveSprite(cursor2, 100, 100)
 }
 
+//  Funció per la gestió del trueque
 function trueque() {
+    let cost: number;
+    let guany: number;
+    let necessari: number;
+    let guanyArbres: number;
     
-    if (seleccionarItem.includes("Ous") && info.score() >= 3 * quantitat) {
-        ous += 12 * quantitat
-        info.changeScoreBy(-3 * quantitat)
-        game.splash("Conversió feta correctament")
-    } else if (seleccionarItem.includes("Gallines") && info.score() >= 6 * quantitat) {
-        gallines += 1 * quantitat
-        info.changeScoreBy(-6 * quantitat)
-        game.splash("Conversió feta correctament")
-    } else if (seleccionarItem.includes("Cavalls") && info.score() >= 12 * quantitat) {
-        cavalls += 1 * quantitat
-        info.changeScoreBy(-12 * quantitat)
-        game.splash("Conversió feta correctament")
-    } else if (seleccionarItem.includes("Cabres") && info.score() >= 5 * quantitat) {
-        cabres += 1 * quantitat
-        info.changeScoreBy(-5 * quantitat)
-        game.splash("Conversió feta correctament")
-    } else if (seleccionarItem.includes("patates") && info.score() >= 2 * quantitat) {
-        patates += 1 * quantitat
-        info.changeScoreBy(-2 * quantitat)
-        game.splash("Conversió feta correctament")
+    if (seleccionarItem.includes("Ous")) {
+        if (modeTrueque == "comprar") {
+            cost = 3 * quantitat
+            guany = 12 * quantitat
+            if (info.score() >= cost) {
+                ous += guany
+                info.changeScoreBy(0 - cost)
+                game.splash("Conversió feta: +" + ("" + ("" + guany)) + " ous")
+            } else {
+                game.splash("No tens prou arbres!")
+            }
+            
+        } else {
+            necessari = 12 * quantitat
+            guanyArbres = 3 * quantitat
+            if (ous >= necessari) {
+                ous += 0 - necessari
+                info.changeScoreBy(guanyArbres)
+                game.splash("Conversió feta: +" + ("" + ("" + guanyArbres)) + " arbres")
+            } else {
+                game.splash("No tens prou ous!")
+            }
+            
+        }
+        
+    } else if (seleccionarItem.includes("Gallines")) {
+        if (modeTrueque == "comprar") {
+            cost = 6 * quantitat
+            if (info.score() >= cost) {
+                gallines += 1 * quantitat
+                info.changeScoreBy(0 - cost)
+                game.splash("Conversió feta: +" + ("" + ("" + quantitat)) + " gallina/es")
+            } else {
+                game.splash("No tens prou arbres!")
+            }
+            
+        } else if (gallines >= quantitat) {
+            gallines += 0 - quantitat
+            info.changeScoreBy(6 * quantitat)
+            game.splash("Conversió feta: +" + ("" + ("" + 6 * quantitat)) + " arbres")
+        } else {
+            game.splash("No tens prou gallines!")
+        }
+        
+    } else if (seleccionarItem.includes("Cavalls")) {
+        if (modeTrueque == "comprar") {
+            cost = 12 * quantitat
+            if (info.score() >= cost) {
+                cavalls += 1 * quantitat
+                info.changeScoreBy(0 - cost)
+                game.splash("Conversió feta: +" + ("" + ("" + quantitat)) + " cavalls")
+            } else {
+                game.splash("No tens prou arbres!")
+            }
+            
+        } else if (cavalls >= quantitat) {
+            cavalls += 0 - quantitat
+            info.changeScoreBy(12 * quantitat)
+            game.splash("Conversió feta: +" + ("" + ("" + 12 * quantitat)) + " arbres")
+        } else {
+            game.splash("No tens prou cavalls!")
+        }
+        
+    } else if (seleccionarItem.includes("Cabres")) {
+        if (modeTrueque == "comprar") {
+            cost = 5 * quantitat
+            if (info.score() >= cost) {
+                cabres += 1 * quantitat
+                info.changeScoreBy(0 - cost)
+                game.splash("Conversió feta: +" + ("" + ("" + quantitat)) + " cabres")
+            } else {
+                game.splash("No tens prou arbres!")
+            }
+            
+        } else if (cabres >= quantitat) {
+            cabres += 0 - quantitat
+            info.changeScoreBy(5 * quantitat)
+            game.splash("Conversió feta: +" + ("" + ("" + 5 * quantitat)) + " arbres")
+        } else {
+            game.splash("No tens prou cabres!")
+        }
+        
+    } else if (seleccionarItem.includes("Patates")) {
+        if (modeTrueque == "comprar") {
+            cost = 2 * quantitat
+            if (info.score() >= cost) {
+                patates += 1 * quantitat
+                info.changeScoreBy(0 - cost)
+                game.splash("Conversió feta: +" + ("" + ("" + quantitat)) + " patates")
+            } else {
+                game.splash("No tens prou arbres!")
+            }
+            
+        } else if (patates >= quantitat) {
+            patates += 0 - quantitat
+            info.changeScoreBy(2 * quantitat)
+            game.splash("Conversió feta: +" + ("" + ("" + 2 * quantitat)) + " arbres")
+        } else {
+            game.splash("No tens prou patates!")
+        }
+        
     } else {
-        game.splash("No tens suficients arbres per fer un trueque!")
+        game.splash("No hi ha cap item seleccionat!")
     }
     
 }
@@ -92,7 +203,7 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function on_down_pressed(
             nena-animation-down
             `, 500, false)
 })
-sprites.onOverlap(SpriteKind.sumar, SpriteKind.cursor, function on_on_overlap2(sprite4: Sprite, otherSprite3: Sprite) {
+sprites.onOverlap(SpriteKind.sumar, SpriteKind.cursor, function on_on_overlap3(sprite4: Sprite, otherSprite3: Sprite) {
     
     if (clicPermes) {
         quantitat += 1
@@ -137,7 +248,9 @@ function obrir_menu() {
     myMenu.onButtonPressed(controller.B, function on_button_pressed(selection: string, selectedIndex: any) {
         
         seleccionarItem = selection
+        modeTrueque = "comprar"
         obrir_trueque()
+        actualitzar_text_mode()
         pause(50)
         myMenu.close()
     })
@@ -172,6 +285,14 @@ function sortir_trueque() {
     
     if (confirmarBoto) {
         sprites.destroy(confirmarBoto)
+    }
+    
+    if (modeBoto) {
+        sprites.destroy(modeBoto)
+    }
+    
+    if (modeText) {
+        sprites.destroy(modeText)
     }
     
     if (cursor2) {
@@ -211,6 +332,14 @@ function tancar_trueque() {
         sprites.destroy(confirmarBoto)
     }
     
+    if (modeBoto) {
+        sprites.destroy(modeBoto)
+    }
+    
+    if (modeText) {
+        sprites.destroy(modeText)
+    }
+    
     if (cursor2) {
         sprites.destroy(cursor2)
     }
@@ -243,6 +372,19 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function on_left_pressed(
             nena-animation-left
             `, 500, false)
 })
+//  Funció per actualitzar el text de mode
+function actualitzar_text_mode() {
+    if (modeText) {
+        if (modeTrueque == "comprar") {
+            modeText.setText("Mode: COMPRAR")
+        } else {
+            modeText.setText("Mode: VENDRE")
+        }
+        
+    }
+    
+}
+
 //  Funció quan cliques la tecla "A"
 controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
     if (pantalla == "trueque") {
@@ -276,7 +418,7 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function on_up_pressed() {
             nena-animation-up
             `, 500, false)
 })
-sprites.onOverlap(SpriteKind.confirmar, SpriteKind.cursor, function on_on_overlap3(sprite: Sprite, otherSprite: Sprite) {
+sprites.onOverlap(SpriteKind.confirmar, SpriteKind.cursor, function on_on_overlap4(sprite5: Sprite, otherSprite4: Sprite) {
     
     if (pantalla == "trueque" && clicPermes) {
         clicPermes = false
@@ -284,7 +426,7 @@ sprites.onOverlap(SpriteKind.confirmar, SpriteKind.cursor, function on_on_overla
     }
     
 })
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_on_overlap4(player2: Sprite, enemy: Sprite) {
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_on_overlap5(player2: Sprite, enemy: Sprite) {
     info.changeScoreBy(1)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
     sprites.destroy(enemy, effects.spray, 500)
@@ -294,6 +436,8 @@ let myMenu : miniMenu.MenuSprite = null
 let inventari : miniMenu.MenuItem[] = []
 let seleccionarItem = ""
 let cursor2 : Sprite = null
+let modeText : TextSprite = null
+let modeBoto : Sprite = null
 let confirmarBoto : Sprite = null
 let restarBoto : Sprite = null
 let sumarBoto : Sprite = null
@@ -301,6 +445,7 @@ let nena : Sprite = null
 let quantitatSeleccionada : TextSprite = null
 let quantitat = 0
 let clicPermes = false
+let modeTrueque = ""
 let menuObert = false
 let gallines = 0
 let cavalls = 0
@@ -323,6 +468,7 @@ cabres = 0
 cavalls = 0
 gallines = 0
 menuObert = false
+modeTrueque = "comprar"
 game.onUpdate(function on_on_update() {
     if (menuObert == true) {
         scene.centerCameraAt(80, 60)

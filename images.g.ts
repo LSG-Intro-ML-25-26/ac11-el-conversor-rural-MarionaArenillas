@@ -637,6 +637,25 @@ f 1 1 1 1 1 1 1 1 1 1 1 1 1 1 f
 f 1 1 1 1 1 1 1 1 1 1 1 1 1 1 f 
 f f f f f f f f f f f f f f f f 
 `;
+            case "image19":
+            case "mode":return img`
+ffffffffffffffffffffff
+f11111111111111111111f
+f11111111111111111111f
+f11111111111111111111f
+f11111111111111111111f
+f1f111f1fff1fff11fff1f
+f1ff1ff1f1f1f11f1f111f
+f1fffff1f1f1f11f1ff11f
+f1f1f1f1f1f1f11f1f111f
+f1f111f1fff1fff11fff1f
+f11111111111111111111f
+f11111111111111111111f
+f11111111111111111111f
+f11111111111111111111f
+f11111111111111111111f
+ffffffffffffffffffffff
+`;
         }
         return null;
     })
