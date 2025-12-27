@@ -286,7 +286,7 @@ def obrir_menu():
         scene.camera_follow_sprite(nena)
     my_menu.on_button_pressed(controller.A, on_button_pressed2)
 
-# Funció per destruir la UI del trueque    
+# Funció per destruir la UI del trueque
 def destruir_ui_trueque():
     global sumar_boto, restar_boto, confirmar_boto, mode_boto, mode_text, cursor2, quantitat_seleccionada
     # destruir UI del trueque
@@ -371,7 +371,7 @@ def on_overlap_jugador_cofre(sprite22, location2):
         obrir_menu()
 scene.on_overlap_tile(SpriteKind.player, sprites.dungeon.chest_closed, on_overlap_jugador_cofre)
 
-# Quan la nena recull un arbre --> sumar 1 punt, reprodueir so i eliminar arbre. 
+# Quan la nena recull un arbre --> sumar 1 punt, reprodueir so i eliminar arbre.
 def on_overlap_jugador_arbre(player2, enemy):
     info.change_score_by(1)
     music.play(music.melody_playable(music.power_up),

@@ -298,7 +298,7 @@ function obrir_menu() {
     })
 }
 
-//  Funció per destruir la UI del trueque    
+//  Funció per destruir la UI del trueque
 function destruir_ui_trueque() {
     
     //  destruir UI del trueque
@@ -411,7 +411,7 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function on_
     }
     
 })
-//  Quan la nena recull un arbre --> sumar 1 punt, reprodueir so i eliminar arbre. 
+//  Quan la nena recull un arbre --> sumar 1 punt, reprodueir so i eliminar arbre.
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap_jugador_arbre(player2: Sprite, enemy: Sprite) {
     info.changeScoreBy(1)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
