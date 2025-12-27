@@ -7,14 +7,15 @@ namespace SpriteKind {
     export const mode = SpriteKind.create()
 }
 
-sprites.onOverlap(SpriteKind.mode, SpriteKind.cursor, function on_on_overlap(sprite: Sprite, otherSprite: Sprite) {
+//  Quan el cursor toca el botó de Mode --> canviar entre COMPRAR i VENDRE
+sprites.onOverlap(SpriteKind.mode, SpriteKind.cursor, function on_overlap_boto_mode(sprite_mode: Sprite, sprite_cursor: Sprite) {
     
-    if (pantalla == "trueque" && clicPermes) {
-        clicPermes = false
-        if (modeTrueque == "comprar") {
-            modeTrueque = "vendre"
+    if (pantalla == "trueque" && clic_permes) {
+        clic_permes = false
+        if (mode_trueque == "comprar") {
+            mode_trueque = "vendre"
         } else {
-            modeTrueque = "comprar"
+            mode_trueque = "comprar"
         }
         
         actualitzar_text_mode()
@@ -22,25 +23,66 @@ sprites.onOverlap(SpriteKind.mode, SpriteKind.cursor, function on_on_overlap(spr
     }
     
 })
-sprites.onOverlap(SpriteKind.restar, SpriteKind.cursor, function on_on_overlap2(sprite3: Sprite, otherSprite2: Sprite) {
+//  Quan el cursor toca el botó sumar --> augmentar la quantitat
+sprites.onOverlap(SpriteKind.sumar, SpriteKind.cursor, function on_overlap_boto_sumar(sprite_sumar: Sprite, sprite_cursor: Sprite) {
     
-    if (clicPermes && quantitat > 1) {
+    if (clic_permes) {
+        quantitat += 1
+        quantitat_seleccionada.setText("" + quantitat)
+        clic_permes = false
+    }
+    
+})
+//  Quan el cursor toca el botó restar --> disminueix la quantitat
+sprites.onOverlap(SpriteKind.restar, SpriteKind.cursor, function on_overlap_boto_restar(sprite_restar: Sprite, sprite_cursor: Sprite) {
+    
+    if (clic_permes && quantitat > 1) {
         quantitat += 0 - 1
-        quantitatSeleccionada.setText("" + ("" + quantitat))
-        clicPermes = false
+        quantitat_seleccionada.setText("" + quantitat)
+        clic_permes = false
+    }
+    
+})
+//  Quan el cursor toca el botó confirmar --> confirmem la Conversió
+sprites.onOverlap(SpriteKind.confirmar, SpriteKind.cursor, function on_overlap_boto_confirmar(sprite_confirmar: Sprite, sprite_cursor: Sprite) {
+    
+    if (pantalla == "trueque" && clic_permes) {
+        clic_permes = false
+        trueque()
     }
     
 })
 scene.onOverlapTile(SpriteKind.Player, sprites.castle.tileDarkGrass2, function on_overlap_tile(sprite2: Sprite, location: tiles.Location) {
     game.gameOver(true)
 })
+//  Funcions moviments animats de la nena
+controller.down.onEvent(ControllerButtonEvent.Pressed, function on_down_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-down
+            `, 500, false)
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function on_right_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-right
+            `, 500, false)
+})
+controller.left.onEvent(ControllerButtonEvent.Pressed, function on_left_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-left
+            `, 500, false)
+})
+controller.up.onEvent(ControllerButtonEvent.Pressed, function on_up_pressed() {
+    animation.runImageAnimation(nena, assets.animation`
+            nena-animation-up
+            `, 500, false)
+})
 //  Funció obrir trueque
 function obrir_trueque() {
     
     pantalla = "trueque"
     joc = false
-    clicPermes = false
-    menuObert = true
+    clic_permes = false
+    menu_obert = true
     quantitat = 1
     //  Canvi real d'escena
     tiles.setCurrentTilemap(tilemap`
@@ -52,30 +94,30 @@ function obrir_trueque() {
     }
     
     //  Quantitats
-    quantitatSeleccionada = textsprite.create("1")
-    quantitatSeleccionada.setMaxFontHeight(15)
-    quantitatSeleccionada.setPosition(80, 29)
+    quantitat_seleccionada = textsprite.create("1")
+    quantitat_seleccionada.setMaxFontHeight(15)
+    quantitat_seleccionada.setPosition(80, 29)
     sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     //  Botons
-    sumarBoto = sprites.create(assets.image`
+    sumar_boto = sprites.create(assets.image`
         sumar
         `, SpriteKind.sumar)
-    sumarBoto.setPosition(121, 59)
-    restarBoto = sprites.create(assets.image`
+    sumar_boto.setPosition(121, 59)
+    restar_boto = sprites.create(assets.image`
         restar
         `, SpriteKind.restar)
-    restarBoto.setPosition(32, 59)
-    confirmarBoto = sprites.create(assets.image`
+    restar_boto.setPosition(32, 59)
+    confirmar_boto = sprites.create(assets.image`
             confirmar
             `, SpriteKind.confirmar)
-    confirmarBoto.setPosition(76, 59)
-    modeBoto = sprites.create(assets.image`
+    confirmar_boto.setPosition(76, 59)
+    mode_boto = sprites.create(assets.image`
         mode
         `, SpriteKind.mode)
-    modeBoto.setPosition(76, 94)
-    modeText = textsprite.create("Mode: COMPRAR")
-    modeText.setMaxFontHeight(10)
-    modeText.setPosition(80, 12)
+    mode_boto.setPosition(76, 94)
+    mode_text = textsprite.create("Mode: COMPRAR")
+    mode_text.setMaxFontHeight(10)
+    mode_text.setPosition(80, 12)
     cursor2 = sprites.create(assets.image`
         cursor
         `, SpriteKind.cursor)
@@ -88,10 +130,10 @@ function trueque() {
     let cost: number;
     let guany: number;
     let necessari: number;
-    let guanyArbres: number;
+    let guany_arbres: number;
     
-    if (seleccionarItem.includes("Ous")) {
-        if (modeTrueque == "comprar") {
+    if (seleccionar_item.includes("Ous")) {
+        if (mode_trueque == "comprar") {
             cost = 3 * quantitat
             guany = 12 * quantitat
             if (info.score() >= cost) {
@@ -104,19 +146,19 @@ function trueque() {
             
         } else {
             necessari = 12 * quantitat
-            guanyArbres = 3 * quantitat
+            guany_arbres = 3 * quantitat
             if (ous >= necessari) {
                 ous += 0 - necessari
-                info.changeScoreBy(guanyArbres)
-                game.splash("Conversió feta: +" + ("" + ("" + guanyArbres)) + " arbres")
+                info.changeScoreBy(guany_arbres)
+                game.splash("Conversió feta: +" + ("" + ("" + guany_arbres)) + " arbres")
             } else {
                 game.splash("No tens prou ous!")
             }
             
         }
         
-    } else if (seleccionarItem.includes("Gallines")) {
-        if (modeTrueque == "comprar") {
+    } else if (seleccionar_item.includes("Gallines")) {
+        if (mode_trueque == "comprar") {
             cost = 6 * quantitat
             if (info.score() >= cost) {
                 gallines += 1 * quantitat
@@ -134,8 +176,8 @@ function trueque() {
             game.splash("No tens prou gallines!")
         }
         
-    } else if (seleccionarItem.includes("Cavalls")) {
-        if (modeTrueque == "comprar") {
+    } else if (seleccionar_item.includes("Cavalls")) {
+        if (mode_trueque == "comprar") {
             cost = 12 * quantitat
             if (info.score() >= cost) {
                 cavalls += 1 * quantitat
@@ -153,8 +195,8 @@ function trueque() {
             game.splash("No tens prou cavalls!")
         }
         
-    } else if (seleccionarItem.includes("Cabres")) {
-        if (modeTrueque == "comprar") {
+    } else if (seleccionar_item.includes("Cabres")) {
+        if (mode_trueque == "comprar") {
             cost = 5 * quantitat
             if (info.score() >= cost) {
                 cabres += 1 * quantitat
@@ -172,8 +214,8 @@ function trueque() {
             game.splash("No tens prou cabres!")
         }
         
-    } else if (seleccionarItem.includes("Patates")) {
-        if (modeTrueque == "comprar") {
+    } else if (seleccionar_item.includes("patates")) {
+        if (mode_trueque == "comprar") {
             cost = 2 * quantitat
             if (info.score() >= cost) {
                 patates += 1 * quantitat
@@ -197,28 +239,13 @@ function trueque() {
     
 }
 
-//  Funcions moviments animats de la nena
-controller.down.onEvent(ControllerButtonEvent.Pressed, function on_down_pressed() {
-    animation.runImageAnimation(nena, assets.animation`
-            nena-animation-down
-            `, 500, false)
-})
-sprites.onOverlap(SpriteKind.sumar, SpriteKind.cursor, function on_on_overlap3(sprite4: Sprite, otherSprite3: Sprite) {
-    
-    if (clicPermes) {
-        quantitat += 1
-        quantitatSeleccionada.setText("" + ("" + quantitat))
-        clicPermes = false
-    }
-    
-})
 //  Funció menú inventari
 function obrir_menu() {
     
     pantalla = "inventari"
-    menuObert = true
+    menu_obert = true
     joc = false
-    mapaAnterior = tilemap`
+    mapa_anterior = tilemap`
         mapa0
         `
     tiles.setCurrentTilemap(tilemap`
@@ -237,33 +264,33 @@ function obrir_menu() {
                 `), miniMenu.createMenuItem("1,5kg/patates " + ("" + ("" + patates)), assets.image`
                 patata1
                 `)]
-    myMenu = miniMenu.createMenuFromArray(inventari)
-    myMenu.setTitle("Inventari")
-    myMenu.setFrame(assets.image`
+    my_menu = miniMenu.createMenuFromArray(inventari)
+    my_menu.setTitle("Inventari")
+    my_menu.setFrame(assets.image`
         menu1
         `)
-    myMenu.setPosition(80, 60)
-    myMenu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 50)
+    my_menu.setPosition(80, 60)
+    my_menu.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 50)
     //  B: seleccionar item i obrir trueque
-    myMenu.onButtonPressed(controller.B, function on_button_pressed(selection: string, selectedIndex: any) {
+    my_menu.onButtonPressed(controller.B, function on_button_pressed(selection: string, selectedIndex: any) {
         
-        seleccionarItem = selection
-        modeTrueque = "comprar"
+        seleccionar_item = selection
+        mode_trueque = "comprar"
         obrir_trueque()
         actualitzar_text_mode()
         pause(50)
-        myMenu.close()
+        my_menu.close()
     })
     //  A: tancar inventari i tornar al joc
-    myMenu.onButtonPressed(controller.A, function on_button_pressed2(selection2: any, selectedIndex2: any) {
+    my_menu.onButtonPressed(controller.A, function on_button_pressed2(selection2: any, selectedIndex2: any) {
         
         pantalla = "joc"
         joc = true
-        menuObert = false
-        myMenu.close()
+        menu_obert = false
+        my_menu.close()
         //  Tornar al laberint
-        if (mapaAnterior) {
-            tiles.setCurrentTilemap(mapaAnterior)
+        if (mapa_anterior) {
+            tiles.setCurrentTilemap(mapa_anterior)
         }
         
         controller.moveSprite(nena, 100, 100)
@@ -271,39 +298,52 @@ function obrir_menu() {
     })
 }
 
-//  Funció per sortir de treque i tornar al laberint
-function sortir_trueque() {
+//  Funció per destruir la UI del trueque    
+function destruir_ui_trueque() {
     
     //  destruir UI del trueque
-    if (sumarBoto) {
-        sprites.destroy(sumarBoto)
+    if (sumar_boto) {
+        sprites.destroy(sumar_boto)
+        sumar_boto = null
     }
     
-    if (restarBoto) {
-        sprites.destroy(restarBoto)
+    if (restar_boto) {
+        sprites.destroy(restar_boto)
+        restar_boto = null
     }
     
-    if (confirmarBoto) {
-        sprites.destroy(confirmarBoto)
+    if (confirmar_boto) {
+        sprites.destroy(confirmar_boto)
+        confirmar_boto = null
     }
     
-    if (modeBoto) {
-        sprites.destroy(modeBoto)
+    if (mode_boto) {
+        sprites.destroy(mode_boto)
+        mode_boto = null
     }
     
-    if (modeText) {
-        sprites.destroy(modeText)
+    if (mode_text) {
+        sprites.destroy(mode_text)
+        mode_text = null
     }
     
     if (cursor2) {
         sprites.destroy(cursor2)
+        cursor2 = null
     }
     
-    if (quantitatSeleccionada) {
-        sprites.destroy(quantitatSeleccionada)
+    if (quantitat_seleccionada) {
+        sprites.destroy(quantitat_seleccionada)
+        quantitat_seleccionada = null
     }
     
-    menuObert = false
+}
+
+//  Funció per sortir de treque i tornar al laberint
+function sortir_trueque() {
+    
+    destruir_ui_trueque()
+    menu_obert = false
     pantalla = "joc"
     joc = true
     //  tornar al laberint
@@ -316,40 +356,12 @@ function sortir_trueque() {
     tiles.placeOnRandomTile(nena, sprites.dungeon.chestOpen)
 }
 
-//  Funció per tancar trueque
+//  Funció per tancar trueque i tornar a l'inventari
 function tancar_trueque() {
     
-    //  destruir UI trueque
-    if (sumarBoto) {
-        sprites.destroy(sumarBoto)
-    }
-    
-    if (restarBoto) {
-        sprites.destroy(restarBoto)
-    }
-    
-    if (confirmarBoto) {
-        sprites.destroy(confirmarBoto)
-    }
-    
-    if (modeBoto) {
-        sprites.destroy(modeBoto)
-    }
-    
-    if (modeText) {
-        sprites.destroy(modeText)
-    }
-    
-    if (cursor2) {
-        sprites.destroy(cursor2)
-    }
-    
-    if (quantitatSeleccionada) {
-        sprites.destroy(quantitatSeleccionada)
-    }
-    
+    destruir_ui_trueque()
     pantalla = "inventari"
-    menuObert = true
+    menu_obert = true
     joc = false
     //  tornar al mapa de l'inventari
     tiles.setCurrentTilemap(tilemap`
@@ -362,23 +374,13 @@ function tancar_trueque() {
     
 }
 
-controller.right.onEvent(ControllerButtonEvent.Pressed, function on_right_pressed() {
-    animation.runImageAnimation(nena, assets.animation`
-            nena-animation-right
-            `, 500, false)
-})
-controller.left.onEvent(ControllerButtonEvent.Pressed, function on_left_pressed() {
-    animation.runImageAnimation(nena, assets.animation`
-            nena-animation-left
-            `, 500, false)
-})
 //  Funció per actualitzar el text de mode
 function actualitzar_text_mode() {
-    if (modeText) {
-        if (modeTrueque == "comprar") {
-            modeText.setText("Mode: COMPRAR")
+    if (mode_text) {
+        if (mode_trueque == "comprar") {
+            mode_text.setText("Mode: COMPRAR")
         } else {
-            modeText.setText("Mode: VENDRE")
+            mode_text.setText("Mode: VENDRE")
         }
         
     }
@@ -392,14 +394,16 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
     }
     
 })
+//  Funció quan cliques la tecla "B"
 controller.B.onEvent(ControllerButtonEvent.Pressed, function on_b_pressed() {
     
     if (pantalla == "trueque") {
-        clicPermes = true
+        clic_permes = true
     }
     
 })
-scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function on_overlap_tile2(sprite22: Sprite, location2: tiles.Location) {
+//  Quan la nena es posiciona sobre el cofre tancat
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function on_overlap_jugador_cofre(sprite22: Sprite, location2: tiles.Location) {
     
     if (pantalla == "joc") {
         joc = false
@@ -407,70 +411,44 @@ scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function on_
     }
     
 })
-controller.menu.onEvent(ControllerButtonEvent.Pressed, function on_menu_pressed() {
-    if (pantalla == "trueque") {
-        tancar_trueque()
-    }
-    
-})
-controller.up.onEvent(ControllerButtonEvent.Pressed, function on_up_pressed() {
-    animation.runImageAnimation(nena, assets.animation`
-            nena-animation-up
-            `, 500, false)
-})
-sprites.onOverlap(SpriteKind.confirmar, SpriteKind.cursor, function on_on_overlap4(sprite5: Sprite, otherSprite4: Sprite) {
-    
-    if (pantalla == "trueque" && clicPermes) {
-        clicPermes = false
-        trueque()
-    }
-    
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_on_overlap5(player2: Sprite, enemy: Sprite) {
+//  Quan la nena recull un arbre --> sumar 1 punt, reprodueir so i eliminar arbre. 
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap_jugador_arbre(player2: Sprite, enemy: Sprite) {
     info.changeScoreBy(1)
     music.play(music.melodyPlayable(music.powerUp), music.PlaybackMode.InBackground)
     sprites.destroy(enemy, effects.spray, 500)
 })
-let arbre : Sprite = null
-let myMenu : miniMenu.MenuSprite = null
-let inventari : miniMenu.MenuItem[] = []
-let seleccionarItem = ""
-let cursor2 : Sprite = null
-let modeText : TextSprite = null
-let modeBoto : Sprite = null
-let confirmarBoto : Sprite = null
-let restarBoto : Sprite = null
-let sumarBoto : Sprite = null
+//  VARIABLES GLOBALS
 let nena : Sprite = null
-let quantitatSeleccionada : TextSprite = null
+let arbre : Sprite = null
+let my_menu : miniMenu.MenuSprite = null
+let inventari : miniMenu.MenuItem[] = []
+let seleccionar_item = ""
+let sumar_boto : Sprite = null
+let restar_boto : Sprite = null
+let confirmar_boto : Sprite = null
+let mode_boto : Sprite = null
+let mode_text : TextSprite = null
+let quantitat_seleccionada : TextSprite = null
+let cursor2 : Sprite = null
+let pantalla = "joc"
+let joc = true
+let menu_obert = false
+let clic_permes = false
+let joc_inicialitzat = false
+let mapa_anterior = tilemap`
+    mapa0
+    `
 let quantitat = 0
-let clicPermes = false
-let modeTrueque = ""
-let menuObert = false
+let mode_trueque = "comprar"
 let gallines = 0
 let cavalls = 0
 let cabres = 0
 let ous = 0
 let patates = 0
-let joc = false
-let pantalla = ""
-let mapaAnterior : tiles.TileMapData = null
-let jocInicialitzat = false
-mapaAnterior = tilemap`
-    mapa0
-    `
-pantalla = "joc"
 info.setScore(0)
-joc = true
-patates = 0
-ous = 0
-cabres = 0
-cavalls = 0
-gallines = 0
-menuObert = false
-modeTrueque = "comprar"
+//  Mantenir la camera centrada quan hi ha algun menú obert
 game.onUpdate(function on_on_update() {
-    if (menuObert == true) {
+    if (menu_obert == true) {
         scene.centerCameraAt(80, 60)
     }
     

@@ -7,25 +7,44 @@ class SpriteKind:
     confirmar = SpriteKind.create()
     mode = SpriteKind.create()
 
-def on_on_overlap(sprite, otherSprite):
-    global clicPermes, modeTrueque
-    if pantalla == "trueque" and clicPermes:
-        clicPermes = False
-        if modeTrueque == "comprar":
-            modeTrueque = "vendre"
+# Quan el cursor toca el botó de Mode --> canviar entre COMPRAR i VENDRE
+def on_overlap_boto_mode(sprite_mode, sprite_cursor):
+    global clic_permes, mode_trueque
+    if pantalla == "trueque" and clic_permes:
+        clic_permes = False
+        if mode_trueque == "comprar":
+            mode_trueque = "vendre"
         else:
-            modeTrueque = "comprar"
+            mode_trueque = "comprar"
         actualitzar_text_mode()
         game.splash("Mode canviat!")
-sprites.on_overlap(SpriteKind.mode, SpriteKind.cursor, on_on_overlap)
+sprites.on_overlap(SpriteKind.mode, SpriteKind.cursor, on_overlap_boto_mode)
 
-def on_on_overlap2(sprite3, otherSprite2):
-    global quantitat, clicPermes
-    if clicPermes and quantitat > 1:
+# Quan el cursor toca el botó sumar --> augmentar la quantitat
+def on_overlap_boto_sumar(sprite_sumar, sprite_cursor):
+    global quantitat, clic_permes
+    if clic_permes:
+        quantitat += 1
+        quantitat_seleccionada.set_text(str(quantitat))
+        clic_permes = False
+sprites.on_overlap(SpriteKind.sumar, SpriteKind.cursor, on_overlap_boto_sumar)
+
+# Quan el cursor toca el botó restar --> disminueix la quantitat
+def on_overlap_boto_restar(sprite_restar, sprite_cursor):
+    global quantitat, clic_permes
+    if clic_permes and quantitat > 1:
         quantitat += 0 - 1
-        quantitatSeleccionada.set_text("" + str(quantitat))
-        clicPermes = False
-sprites.on_overlap(SpriteKind.restar, SpriteKind.cursor, on_on_overlap2)
+        quantitat_seleccionada.set_text(str(quantitat))
+        clic_permes = False
+sprites.on_overlap(SpriteKind.restar, SpriteKind.cursor, on_overlap_boto_restar)
+
+# Quan el cursor toca el botó confirmar --> confirmem la Conversió
+def on_overlap_boto_confirmar(sprite_confirmar, sprite_cursor):
+    global clic_permes
+    if pantalla == "trueque" and clic_permes:
+        clic_permes = False
+        trueque()
+sprites.on_overlap(SpriteKind.confirmar, SpriteKind.cursor, on_overlap_boto_confirmar)
 
 def on_overlap_tile(sprite2, location):
     game.game_over(True)
@@ -33,13 +52,47 @@ scene.on_overlap_tile(SpriteKind.player,
     sprites.castle.tile_dark_grass2,
     on_overlap_tile)
 
+# Funcions moviments animats de la nena
+def on_down_pressed():
+    animation.run_image_animation(nena,
+        assets.animation("""
+            nena-animation-down
+            """),
+        500,
+        False)
+controller.down.on_event(ControllerButtonEvent.PRESSED, on_down_pressed)
+def on_right_pressed():
+    animation.run_image_animation(nena,
+        assets.animation("""
+            nena-animation-right
+            """),
+        500,
+        False)
+controller.right.on_event(ControllerButtonEvent.PRESSED, on_right_pressed)
+def on_left_pressed():
+    animation.run_image_animation(nena,
+        assets.animation("""
+            nena-animation-left
+            """),
+        500,
+        False)
+controller.left.on_event(ControllerButtonEvent.PRESSED, on_left_pressed)
+def on_up_pressed():
+    animation.run_image_animation(nena,
+        assets.animation("""
+            nena-animation-up
+            """),
+        500,
+        False)
+controller.up.on_event(ControllerButtonEvent.PRESSED, on_up_pressed)
+
 # Funció obrir trueque
 def obrir_trueque():
-    global pantalla, joc, clicPermes, menuObert, quantitat, quantitatSeleccionada, sumarBoto, restarBoto, confirmarBoto, modeBoto, modeText, cursor2
+    global pantalla, joc, clic_permes, menu_obert, quantitat, quantitat_seleccionada, sumar_boto, restar_boto, confirmar_boto, mode_boto, mode_text, cursor2
     pantalla = "trueque"
     joc = False
-    clicPermes = False
-    menuObert = True
+    clic_permes = False
+    menu_obert = True
     quantitat = 1
     # Canvi real d'escena
     tiles.set_current_tilemap(tilemap("""
@@ -49,41 +102,42 @@ def obrir_trueque():
     if nena:
         controller.move_sprite(nena, 0, 0)
     # Quantitats
-    quantitatSeleccionada = textsprite.create("1")
-    quantitatSeleccionada.set_max_font_height(15)
-    quantitatSeleccionada.set_position(80, 29)
+    quantitat_seleccionada = textsprite.create("1")
+    quantitat_seleccionada.set_max_font_height(15)
+    quantitat_seleccionada.set_position(80, 29)
     sprites.destroy_all_sprites_of_kind(SpriteKind.enemy)
     # Botons
-    sumarBoto = sprites.create(assets.image("""
+    sumar_boto = sprites.create(assets.image("""
         sumar
         """), SpriteKind.sumar)
-    sumarBoto.set_position(121, 59)
-    restarBoto = sprites.create(assets.image("""
+    sumar_boto.set_position(121, 59)
+    restar_boto = sprites.create(assets.image("""
         restar
         """), SpriteKind.restar)
-    restarBoto.set_position(32, 59)
-    confirmarBoto = sprites.create(assets.image("""
+    restar_boto.set_position(32, 59)
+    confirmar_boto = sprites.create(assets.image("""
             confirmar
             """),
         SpriteKind.confirmar)
-    confirmarBoto.set_position(76, 59)
-    modeBoto = sprites.create(assets.image("""
+    confirmar_boto.set_position(76, 59)
+    mode_boto = sprites.create(assets.image("""
         mode
         """), SpriteKind.mode)
-    modeBoto.set_position(76, 94)
-    modeText = textsprite.create("Mode: COMPRAR")
-    modeText.set_max_font_height(10)
-    modeText.set_position(80, 12)
+    mode_boto.set_position(76, 94)
+    mode_text = textsprite.create("Mode: COMPRAR")
+    mode_text.set_max_font_height(10)
+    mode_text.set_position(80, 12)
     cursor2 = sprites.create(assets.image("""
         cursor
         """), SpriteKind.cursor)
     cursor2.set_position(76, 110)
     controller.move_sprite(cursor2, 100, 100)
+
 # Funció per la gestió del trueque
 def trueque():
     global ous, gallines, cavalls, cabres, patates
-    if seleccionarItem.includes("Ous"):
-        if modeTrueque == "comprar":
+    if seleccionar_item.includes("Ous"):
+        if mode_trueque == "comprar":
             cost = 3 * quantitat
             guany = 12 * quantitat
             if info.score() >= cost:
@@ -94,15 +148,15 @@ def trueque():
                 game.splash("No tens prou arbres!")
         else:
             necessari = 12 * quantitat
-            guanyArbres = 3 * quantitat
+            guany_arbres = 3 * quantitat
             if ous >= necessari:
                 ous += 0 - necessari
-                info.change_score_by(guanyArbres)
-                game.splash("Conversió feta: +" + ("" + str(guanyArbres)) + " arbres")
+                info.change_score_by(guany_arbres)
+                game.splash("Conversió feta: +" + ("" + str(guany_arbres)) + " arbres")
             else:
                 game.splash("No tens prou ous!")
-    elif seleccionarItem.includes("Gallines"):
-        if modeTrueque == "comprar":
+    elif seleccionar_item.includes("Gallines"):
+        if mode_trueque == "comprar":
             cost = 6 * quantitat
             if info.score() >= cost:
                 gallines += 1 * quantitat
@@ -116,8 +170,8 @@ def trueque():
             game.splash("Conversió feta: +" + ("" + str(6 * quantitat)) + " arbres")
         else:
             game.splash("No tens prou gallines!")
-    elif seleccionarItem.includes("Cavalls"):
-        if modeTrueque == "comprar":
+    elif seleccionar_item.includes("Cavalls"):
+        if mode_trueque == "comprar":
             cost = 12 * quantitat
             if info.score() >= cost:
                 cavalls += 1 * quantitat
@@ -131,8 +185,8 @@ def trueque():
             game.splash("Conversió feta: +" + ("" + str(12 * quantitat)) + " arbres")
         else:
             game.splash("No tens prou cavalls!")
-    elif seleccionarItem.includes("Cabres"):
-        if modeTrueque == "comprar":
+    elif seleccionar_item.includes("Cabres"):
+        if mode_trueque == "comprar":
             cost = 5 * quantitat
             if info.score() >= cost:
                 cabres += 1 * quantitat
@@ -146,8 +200,8 @@ def trueque():
             game.splash("Conversió feta: +" + ("" + str(5 * quantitat)) + " arbres")
         else:
             game.splash("No tens prou cabres!")
-    elif seleccionarItem.includes("Patates"):
-        if modeTrueque == "comprar":
+    elif seleccionar_item.includes("patates"):
+        if mode_trueque == "comprar":
             cost = 2 * quantitat
             if info.score() >= cost:
                 patates += 1 * quantitat
@@ -163,32 +217,15 @@ def trueque():
             game.splash("No tens prou patates!")
     else:
         game.splash("No hi ha cap item seleccionat!")
-# Funcions moviments animats de la nena
 
-def on_down_pressed():
-    animation.run_image_animation(nena,
-        assets.animation("""
-            nena-animation-down
-            """),
-        500,
-        False)
-controller.down.on_event(ControllerButtonEvent.PRESSED, on_down_pressed)
-
-def on_on_overlap3(sprite4, otherSprite3):
-    global quantitat, clicPermes
-    if clicPermes:
-        quantitat += 1
-        quantitatSeleccionada.set_text("" + str(quantitat))
-        clicPermes = False
-sprites.on_overlap(SpriteKind.sumar, SpriteKind.cursor, on_on_overlap3)
 
 # Funció menú inventari
 def obrir_menu():
-    global pantalla, menuObert, joc, mapaAnterior, inventari, myMenu
+    global pantalla, menu_obert, joc, mapa_anterior, inventari, my_menu
     pantalla = "inventari"
-    menuObert = True
+    menu_obert = True
     joc = False
-    mapaAnterior = tilemap("""
+    mapa_anterior = tilemap("""
         mapa0
         """)
     tiles.set_current_tilemap(tilemap("""
@@ -215,61 +252,71 @@ def obrir_menu():
             assets.image("""
                 patata1
                 """))]
-    myMenu = miniMenu.create_menu_from_array(inventari)
-    myMenu.set_title("Inventari")
-    myMenu.set_frame(assets.image("""
+    my_menu = miniMenu.create_menu_from_array(inventari)
+    my_menu.set_title("Inventari")
+    my_menu.set_frame(assets.image("""
         menu1
         """))
-    myMenu.set_position(80, 60)
-    myMenu.set_style_property(miniMenu.StyleKind.SELECTED,
+    my_menu.set_position(80, 60)
+    my_menu.set_style_property(miniMenu.StyleKind.SELECTED,
         miniMenu.StyleProperty.BACKGROUND,
         50)
     # B: seleccionar item i obrir trueque
-    
     def on_button_pressed(selection, selectedIndex):
-        global seleccionarItem, modeTrueque
-        seleccionarItem = selection
-        modeTrueque = "comprar"
+        global seleccionar_item, mode_trueque
+        seleccionar_item = selection
+        mode_trueque = "comprar"
         obrir_trueque()
         actualitzar_text_mode()
         pause(50)
-        myMenu.close()
-    myMenu.on_button_pressed(controller.B, on_button_pressed)
+        my_menu.close()
+    my_menu.on_button_pressed(controller.B, on_button_pressed)
     
     # A: tancar inventari i tornar al joc
-    
     def on_button_pressed2(selection2, selectedIndex2):
-        global pantalla, joc, menuObert
+        global pantalla, joc, menu_obert
         pantalla = "joc"
         joc = True
-        menuObert = False
-        myMenu.close()
+        menu_obert = False
+        my_menu.close()
         # Tornar al laberint
-        if mapaAnterior:
-            tiles.set_current_tilemap(mapaAnterior)
+        if mapa_anterior:
+            tiles.set_current_tilemap(mapa_anterior)
         controller.move_sprite(nena, 100, 100)
         scene.camera_follow_sprite(nena)
-    myMenu.on_button_pressed(controller.A, on_button_pressed2)
-    
-# Funció per sortir de treque i tornar al laberint
-def sortir_trueque():
-    global menuObert, pantalla, joc
+    my_menu.on_button_pressed(controller.A, on_button_pressed2)
+
+# Funció per destruir la UI del trueque    
+def destruir_ui_trueque():
+    global sumar_boto, restar_boto, confirmar_boto, mode_boto, mode_text, cursor2, quantitat_seleccionada
     # destruir UI del trueque
-    if sumarBoto:
-        sprites.destroy(sumarBoto)
-    if restarBoto:
-        sprites.destroy(restarBoto)
-    if confirmarBoto:
-        sprites.destroy(confirmarBoto)
-    if modeBoto:
-        sprites.destroy(modeBoto)
-    if modeText:
-        sprites.destroy(modeText)
+    if sumar_boto:
+        sprites.destroy(sumar_boto)
+        sumar_boto = None
+    if restar_boto:
+        sprites.destroy(restar_boto)
+        restar_boto = None
+    if confirmar_boto:
+        sprites.destroy(confirmar_boto)
+        confirmar_boto = None
+    if mode_boto:
+        sprites.destroy(mode_boto)
+        mode_boto = None
+    if mode_text:
+        sprites.destroy(mode_text)
+        mode_text = None
     if cursor2:
         sprites.destroy(cursor2)
-    if quantitatSeleccionada:
-        sprites.destroy(quantitatSeleccionada)
-    menuObert = False
+        cursor2 = None
+    if quantitat_seleccionada:
+        sprites.destroy(quantitat_seleccionada)
+        quantitat_seleccionada = None
+
+# Funció per sortir de treque i tornar al laberint
+def sortir_trueque():
+    global menu_obert, pantalla, joc
+    destruir_ui_trueque()
+    menu_obert = False
     pantalla = "joc"
     joc = True
     # tornar al laberint
@@ -280,26 +327,13 @@ def sortir_trueque():
     # tornar a activar moviment
     controller.move_sprite(nena, 100, 100)
     tiles.place_on_random_tile(nena, sprites.dungeon.chest_open)
-# Funció per tancar trueque
+
+# Funció per tancar trueque i tornar a l'inventari
 def tancar_trueque():
-    global pantalla, menuObert, joc
-    # destruir UI trueque
-    if sumarBoto:
-        sprites.destroy(sumarBoto)
-    if restarBoto:
-        sprites.destroy(restarBoto)
-    if confirmarBoto:
-        sprites.destroy(confirmarBoto)
-    if modeBoto:
-        sprites.destroy(modeBoto)
-    if modeText:
-        sprites.destroy(modeText)
-    if cursor2:
-        sprites.destroy(cursor2)
-    if quantitatSeleccionada:
-        sprites.destroy(quantitatSeleccionada)
+    global pantalla, menu_obert, joc
+    destruir_ui_trueque()
     pantalla = "inventari"
-    menuObert = True
+    menu_obert = True
     joc = False
     # tornar al mapa de l'inventari
     tiles.set_current_tilemap(tilemap("""
@@ -309,127 +343,88 @@ def tancar_trueque():
     if nena:
         controller.move_sprite(nena, 0, 0)
 
-def on_right_pressed():
-    animation.run_image_animation(nena,
-        assets.animation("""
-            nena-animation-right
-            """),
-        500,
-        False)
-controller.right.on_event(ControllerButtonEvent.PRESSED, on_right_pressed)
-
-def on_left_pressed():
-    animation.run_image_animation(nena,
-        assets.animation("""
-            nena-animation-left
-            """),
-        500,
-        False)
-controller.left.on_event(ControllerButtonEvent.PRESSED, on_left_pressed)
-
 # Funció per actualitzar el text de mode
 def actualitzar_text_mode():
-    if modeText:
-        if modeTrueque == "comprar":
-            modeText.set_text("Mode: COMPRAR")
+    if mode_text:
+        if mode_trueque == "comprar":
+            mode_text.set_text("Mode: COMPRAR")
         else:
-            modeText.set_text("Mode: VENDRE")
-# Funció quan cliques la tecla "A"
+            mode_text.set_text("Mode: VENDRE")
 
+# Funció quan cliques la tecla "A"
 def on_a_pressed():
     if pantalla == "trueque":
         sortir_trueque()
 controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
-
+# Funció quan cliques la tecla "B"
 def on_b_pressed():
-    global clicPermes
+    global clic_permes
     if pantalla == "trueque":
-        clicPermes = True
+        clic_permes = True
 controller.B.on_event(ControllerButtonEvent.PRESSED, on_b_pressed)
 
-def on_overlap_tile2(sprite22, location2):
+# Quan la nena es posiciona sobre el cofre tancat
+def on_overlap_jugador_cofre(sprite22, location2):
     global joc
     if pantalla == "joc":
         joc = False
         obrir_menu()
-scene.on_overlap_tile(SpriteKind.player,
-    sprites.dungeon.chest_closed,
-    on_overlap_tile2)
+scene.on_overlap_tile(SpriteKind.player, sprites.dungeon.chest_closed, on_overlap_jugador_cofre)
 
-def on_menu_pressed():
-    if pantalla == "trueque":
-        tancar_trueque()
-controller.menu.on_event(ControllerButtonEvent.PRESSED, on_menu_pressed)
-
-def on_up_pressed():
-    animation.run_image_animation(nena,
-        assets.animation("""
-            nena-animation-up
-            """),
-        500,
-        False)
-controller.up.on_event(ControllerButtonEvent.PRESSED, on_up_pressed)
-
-def on_on_overlap4(sprite5, otherSprite4):
-    global clicPermes
-    if pantalla == "trueque" and clicPermes:
-        clicPermes = False
-        trueque()
-sprites.on_overlap(SpriteKind.confirmar, SpriteKind.cursor, on_on_overlap4)
-
-def on_on_overlap5(player2, enemy):
+# Quan la nena recull un arbre --> sumar 1 punt, reprodueir so i eliminar arbre. 
+def on_overlap_jugador_arbre(player2, enemy):
     info.change_score_by(1)
     music.play(music.melody_playable(music.power_up),
         music.PlaybackMode.IN_BACKGROUND)
     sprites.destroy(enemy, effects.spray, 500)
-sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_on_overlap5)
+sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_overlap_jugador_arbre)
 
-arbre: Sprite = None
-myMenu: miniMenu.MenuSprite = None
-inventari: List[miniMenu.MenuItem] = []
-seleccionarItem = ""
-cursor2: Sprite = None
-modeText: TextSprite = None
-modeBoto: Sprite = None
-confirmarBoto: Sprite = None
-restarBoto: Sprite = None
-sumarBoto: Sprite = None
+# VARIABLES GLOBALS
 nena: Sprite = None
-quantitatSeleccionada: TextSprite = None
-quantitat = 0
-clicPermes = False
-modeTrueque = ""
-menuObert = False
-gallines = 0
-cavalls = 0
-cabres = 0
-ous = 0
-patates = 0
-joc = False
-pantalla = ""
-mapaAnterior: tiles.TileMapData = None
-jocInicialitzat = False
-mapaAnterior = tilemap("""
+arbre: Sprite = None
+
+my_menu: miniMenu.MenuSprite = None
+inventari: List[miniMenu.MenuItem] = []
+seleccionar_item = ""
+
+sumar_boto: Sprite = None
+restar_boto: Sprite = None
+confirmar_boto: Sprite = None
+mode_boto: Sprite = None
+
+mode_text: TextSprite = None
+quantitat_seleccionada: TextSprite = None
+
+cursor2: Sprite = None
+
+pantalla: str = "joc"
+joc = True
+menu_obert = False
+clic_permes = False
+joc_inicialitzat = False
+
+mapa_anterior = tilemap("""
     mapa0
     """)
-pantalla = "joc"
-info.set_score(0)
-joc = True
-patates = 0
-ous = 0
-cabres = 0
-cavalls = 0
-gallines = 0
-menuObert = False
-modeTrueque = "comprar"
 
+quantitat = 0
+mode_trueque = "comprar"
+
+gallines = 0
+cavalls = 0
+cabres = 0
+ous = 0
+patates = 0
+
+info.set_score(0)
+
+# Mantenir la camera centrada quan hi ha algun menú obert
 def on_on_update():
-    if menuObert == True:
+    if menu_obert == True:
         scene.center_camera_at(80, 60)
 game.on_update(on_on_update)
 
 # Funció per crear arbres cada 5 segons en llocs aleatoris
-
 def on_update_interval():
     global arbre
     if pantalla == "joc" and joc:
